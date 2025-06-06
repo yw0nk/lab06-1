@@ -1,12 +1,13 @@
 
+
 cmake_minimum_required(VERSION 3.5...3.25)
-project(Outrun LANGUAGES CXX)
+project(Tetris LANGUAGES CXX)
 
 # 1. Настройка версии и метаданных для пакета
 set(PACKAGE_VERSION "1.0.0")
-set(CPACK_PACKAGE_NAME "outrun-game")
+set(CPACK_PACKAGE_NAME "tetris-game")
 set(CPACK_PACKAGE_VENDOR "yw0nk")
-set(CPACK_PACKAGE_DESCRIPTION "Outrun Racing Game using SFML")
+set(CPACK_PACKAGE_DESCRIPTION "Classic Tetris Game using SFML")
 set(CPACK_PACKAGE_CONTACT "yw0nk@gmail.com")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "yw0nk")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsfml-dev (>= 2.5.1), libc6 (>= 2.27)")
@@ -26,9 +27,11 @@ else()
     message(WARNING "Папка images не найдена!")
 endif()
 
-add_executable(outrun main.cpp)
 
-target_link_libraries(outrun PRIVATE sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
+# Главный исполняемый файл
+add_executable(tetris main.cpp)
+target_compile_features(tetris PRIVATE cxx_std_17)
+target_link_libraries(tetris PRIVATE sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
 
 # Сначала пробуем найти SFML в системе
 find_package(SFML ${SFML_VERSION} QUIET COMPONENTS graphics window system audio network)
@@ -78,22 +81,8 @@ else()
     message(WARNING "Папка images не найдена!")
 endif()
 
-# 6. Создание исполняемого файла
-add_executable(tatris main.cpp)
-target_compile_features(tatris PRIVATE cxx_std_17)
-target_include_directories(tatris PRIVATE ${SFML_INCLUDE_DIR})
-
-# 7. Линковка SFML
-foreach(COMPONENT graphics window system audio network)
-    if(TARGET sfml-${COMPONENT})
-        target_link_libraries(tatris PRIVATE sfml-${COMPONENT})
-    else()
-        message(WARNING "Компонент SFML ${COMPONENT} не найден!")
-    endif()
-endforeach()
-
 # 8. Установка в систему
-install(TARGETS tatris 
+install(TARGETS tetris 
     RUNTIME DESTINATION bin
     BUNDLE DESTINATION bin
 )
@@ -108,14 +97,14 @@ endif()
 # 10. Дополнительные настройки для Windows
 if(WIN32)
     # Копирование DLL
-    add_custom_command(TARGET tatris POST_BUILD
+    add_custom_command(TARGET tetris POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "$<TARGET_FILE:sfml-graphics>"
         "$<TARGET_FILE:sfml-window>"
         "$<TARGET_FILE:sfml-system>"
         "$<TARGET_FILE:sfml-audio>"
         "$<TARGET_FILE:sfml-network>"
-        "$<TARGET_FILE_DIR:tatris>"
+        "$<TARGET_FILE_DIR:tetris>"
         COMMENT "Копирование DLL SFML"
     )
     
