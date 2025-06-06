@@ -23,12 +23,21 @@ jobs:
           cd build
           cmake -DCMAKE_CXX_COMPILER=clang++ ..
           make
+      - name: List build output
+        run: |
+          ls -l build
           
       - name: Create DEB package
         run: |
           mkdir -p tetris-game/usr/games
           mkdir -p tetris-game/usr/share/tetris-game/images
-          cp build/tetris tetris-game/usr/games/
+          if [ -f build/tetris ]; then
+            cp build/tetris tetris-game/usr/games/
+          elif [ -f build/tetris.exe ]; then
+            cp build/tetris.exe tetris-game/usr/games/
+          else
+            echo "ERROR: tetris binary not found!" && ls -l build && exit 1
+          fi
           cp -r images/* tetris-game/usr/share/tetris-game/images/
           mkdir -p tetris-game/DEBIAN
           echo "Package: tetris-game" > tetris-game/DEBIAN/control
@@ -120,6 +129,9 @@ jobs:
           cd build
           cmake -DSFML_DIR="C:/tools/SFML/lib/cmake/SFML" ..
           cmake --build . --config Release
+      - name: List build output
+        run: |
+          Get-ChildItem -Recurse build | Select-Object FullName, Length
           
       - name: Prepare package files
         run: |
